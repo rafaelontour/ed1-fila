@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <iostream>
 
-int const max = 5;
+int const max = 10;
 
 struct T_Item { // campo como char
 	char campo;
@@ -21,6 +21,7 @@ struct T_ItemInt { // campo como int
 		campo = valor;
 		return *this;
 	}
+
 };
 
 

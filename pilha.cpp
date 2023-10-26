@@ -59,30 +59,34 @@ void calcular(T_Pilha *plOutput, T_PilhaInt *plResult) {
                 break;
             case MULT:
                 res.campo = plResult -> dados[plResult -> topo - 1].campo;
-                res.campo *= (int)plResult -> dados[plResult->topo - 2].campo;
                 removerInt(plResult);
+                res.campo *= plResult -> dados[plResult->topo - 1].campo;
                 removerInt(plResult);
+
                 inserirInt(plResult, res);
                 break;
             case SOMA:
                 res.campo = plResult -> dados[plResult -> topo - 1].campo;
-                res.campo += (int)plResult -> dados[plResult -> topo - 2].campo;
                 removerInt(plResult);
+                res.campo += plResult -> dados[plResult -> topo - 1].campo;
                 removerInt(plResult);
+
                 inserirInt(plResult, res);
                 break; 
             case SUB:
                 res.campo = plResult -> dados[plResult->topo - 1].campo;
-                res.campo -= (int)plResult -> dados[plResult->topo - 2].campo;
                 removerInt(plResult);
+                res.campo -= plResult -> dados[plResult->topo - 1].campo;
                 removerInt(plResult);
+
                 inserirInt(plResult, res);
                 break; 
             case DIV:
                 res.campo = plResult -> dados[plResult->topo - 1].campo;
-                res.campo /= (int)plResult -> dados[plResult->topo - 2].campo;
                 removerInt(plResult);
+                res.campo /= plResult -> dados[plResult->topo - 1].campo;
                 removerInt(plResult);
+
                 inserirInt(plResult, res);
                 break;     
 
@@ -92,28 +96,29 @@ void calcular(T_Pilha *plOutput, T_PilhaInt *plResult) {
 
 int main() {
     T_Pilha pilha;
-    char exp[5];
+    char exp[9];
 
     iniciarPilha(&pilha);
 
     exp[0] = '(';
-    exp[1] = '3';
+    exp[1] = '7';
     exp[2] = '+';
     exp[3] = '(';
-    exp[4] = '7';
+    exp[4] = '5';
     exp[5] = '*';
-    exp[6] = '4';
+    exp[6] = '3';
     exp[7] = ')';
     exp[8] = ')';
 
     posfixa_simples(&pilha, exp);
 
-    for (int i = 0;i < strlen(exp);i++) {
+    for (int i = 0;i < pilha.topo;i++) {
         std::cout << pilha.dados[i].campo << " ";
     }
 
-    printf("Resultado da soma: \n\n");
+    printf("\nResultado da soma: ");
     T_PilhaInt plResult;
+
     iniciarPilhaInt(&plResult);
 
     calcular(&pilha, &plResult);
@@ -121,6 +126,7 @@ int main() {
     for (int i = 0;i < plResult.qtdeAtual;i++) {
         std::cout << plResult.dados[i].campo << " ";
     }
+    printf("\n\n");
 
     return 0;
 }
