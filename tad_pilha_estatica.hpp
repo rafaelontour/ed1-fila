@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <iostream>
+#include <iostream> 
 
 int const max = 10;
 
@@ -7,6 +7,12 @@ struct T_Item { // campo como char
 	char campo;
 
 	T_Item& operator =(char c) {
+		char character;
+		character = c;
+		return *this;
+	}
+
+	T_Item& operator ==(char c) {
 		char character;
 		character = c;
 		return *this;
@@ -30,6 +36,11 @@ struct T_Pilha { // Usando T_Item com campo do tipo char
 	int topo;
 	int qtdeAtual;
 	T_Item dados[max];
+
+	T_Pilha& operator ==(char c) {
+		char character = c;
+		return *this;
+	}
 };
 
 struct T_PilhaInt { // Usando T_Item com campo do tipo int
