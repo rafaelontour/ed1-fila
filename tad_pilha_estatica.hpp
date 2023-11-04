@@ -11,23 +11,15 @@ struct T_Item { // campo como char
 		character = c;
 		return *this;
 	}
-
-	T_Item& operator ==(char c) {
-		char character;
-		character = c;
-		return *this;
-	}
-
 };
 
-struct T_ItemInt { // campo como int
-	int campo;
+struct T_ItemFloat { // campo como int
+	float campo;
 
-	T_ItemInt& operator =(int valor) {
+	T_ItemFloat& operator =(float valor) {
 		campo = valor;
 		return *this;
 	}
-
 };
 
 
@@ -43,11 +35,11 @@ struct T_Pilha { // Usando T_Item com campo do tipo char
 	}
 };
 
-struct T_PilhaInt { // Usando T_Item com campo do tipo int
+struct T_PilhaFloat { // Usando T_Item com campo do tipo int
 	int base;
 	int topo;
 	int qtdeAtual;
-	T_ItemInt dados[max];
+	T_ItemFloat dados[max];
 
 
 };
@@ -58,7 +50,7 @@ void iniciarPilha(T_Pilha *pilha) { // item.campo sendo char
 	(*pilha).qtdeAtual = 0;
 }
 
-void iniciarPilhaInt(T_PilhaInt *pilha) { // item.campo sendo int
+void iniciarPilhaInt(T_PilhaFloat *pilha) { // item.campo sendo int
 	(*pilha).base = 0;
 	(*pilha).topo = 0;
 	(*pilha).qtdeAtual = 0;
@@ -68,7 +60,7 @@ int chkPilhaVazia(T_Pilha *pilha) {
 	return (*pilha).topo == 0;
 }
 
-int chkPilhaVazia(T_PilhaInt *pilha) {
+int chkPilhaVazia(T_PilhaFloat *pilha) {
 	return (*pilha).topo == 0;
 }
 
@@ -86,11 +78,11 @@ int inserir(T_Pilha *pilha, T_Item item) { // Usando item.campo como char
 	return flag;	
 }
 
-int inserirInt(T_PilhaInt *pilha, T_ItemInt item) { // Usando item.campo como int
+int inserirFloat(T_PilhaFloat *pilha, T_ItemFloat item) { // Usando item.campo como int
 	int flag = 0;
 	
 	if ((*pilha).qtdeAtual < max) {
-		(*pilha).dados[(*pilha).topo] = (int)item.campo;
+		(*pilha).dados[(*pilha).topo] = (float)item.campo;
 		(*pilha).topo++;
 		(*pilha).qtdeAtual++;
 		flag = 1;
@@ -115,7 +107,7 @@ int remover(T_Pilha *pilha) {
 	return flag;
 }
 
-int removerInt(T_PilhaInt *pilha) {
+float removerFloat(T_PilhaFloat *pilha) {
 	int flag;
 	
 	if (chkPilhaVazia(pilha) )
