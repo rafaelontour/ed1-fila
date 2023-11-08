@@ -11,17 +11,17 @@ enum Operacoes {
     DIV='/' 
 };
     
-void posfixa_simples(T_Pilha *plOutput, char exp[], bool temParentese) {
+void posfixa_simples(T_Pilha *plOutput, std::string expressao, bool temParentese) {
     T_Pilha plOperadores;
     iniciarPilha(&plOperadores);
     T_Item item;
 
 
     if (temParentese) {
-        for (int i = 0;i < strlen(exp);i++) {
-            item.campo = exp[i];
+        for (int i = 0;i < expressao.length();i++) {
+            item.campo = expressao[i];
         
-            switch (exp[i]) {
+            switch (expressao[i]) {
                 case '0'...'9': 
                     inserir(plOutput, item); // Vetor de números
                     break; 
@@ -40,7 +40,7 @@ void posfixa_simples(T_Pilha *plOutput, char exp[], bool temParentese) {
     }
 }
 
-void calcular(T_Pilha *plOutput, T_PilhaFloat *plResult, bool temParentese, std::string exp) {
+void calcular(T_Pilha *plOutput, T_PilhaFloat *plResult, bool temParentese,  std::string expressao, char exp[]) {
 
     if (temParentese) {
         for (int c = 0;c < plOutput->qtdeAtual;c++) {
@@ -106,22 +106,50 @@ void calcular(T_Pilha *plOutput, T_PilhaFloat *plResult, bool temParentese, std:
             }
         }
     } else { 
-        
         char opAtual = 'p';
         T_Pilha plOperadores;
         T_ItemFloat item;
         T_Item crt;
+        bool chave = false;
+        int k = 0;
+
+        std::string digito = "";
 
         iniciarPilha(&plOperadores);
+        int l = strlen(exp);
 
-        for (int i = 0;i < exp.length();i++) {
-            crt.campo = exp[i];
+        // for (int a = 0, b = 0;a < expressao.length();a++) {
+        //     if (isdigit(expressao[a])) {
+        //         digito += expressao[a];
+        //     } else {
+        //         T_ItemFloat item;
+        //         item.campo = stof(digito);
+        //         inserirFloat(&plResult, item);
 
-            if (isdigit(crt.campo)) {
-                item.campo = (float)crt.campo - 48;
-            }
+        //         digito = "";
 
-            switch (crt.campo) {
+        //         op[b] = expressao[a];
+        //         b++;
+        //     }
+        // }
+
+
+        for (int i = 0;i < expressao.length() - 1;i++) {
+            crt.campo = expressao[i];
+
+            // if (isdigit(crt.campo)) { // Se é dígito
+            //     std::cout << crt.campo;
+            //     ; // Concatena na string
+                
+            // } else {
+            //     item.campo = stof(digito);
+            //     inserirFloat(plResult, item);
+            //     digito = "";
+            // }
+
+            //  34 * 26453
+
+            switch (expressao[i]) {
                 case '0':
                 case '1': 
                 case '2':
@@ -133,63 +161,84 @@ void calcular(T_Pilha *plOutput, T_PilhaFloat *plResult, bool temParentese, std:
                 case '8':
                 case '9':  
 
-                    inserirFloat(plResult, item); // Vetor de números
-
-                    if (opAtual == '*') {
-                        item.campo = plResult -> dados[plResult -> topo - 2].campo;
-                        item.campo *= plResult -> dados[plResult->topo - 1].campo;
-
-                        removerFloat(plResult);
-                        removerFloat(plResult);
-
-                        inserirFloat(plResult, item);
-                    }
-                    if (opAtual == '/') {
-                        item.campo = plResult -> dados[plResult -> topo - 2].campo;
-                        item.campo /= plResult -> dados[plResult -> topo - 1].campo;
-
-                        removerFloat(plResult);
-                        removerFloat(plResult);
+                        std::cout << crt.campo;
+                        digito += crt.campo;
+                        if (i == expressao.length() - 1) {
+                            item.campo = stof(digito);
+                            inserirFloat(plResult, item);
+                        }
                         
-                        inserirFloat(plResult, item);
-                    }
+                    
                     break; 
                 case MULT:
-                    opAtual = '*';
+
+                    item.campo = stof(digito);
+                    inserirFloat(plResult, item);
+
+                    crt.campo = '*';
+                    inserir(&plOperadores, crt);                    
+                    digito = "";
+
                     break;
                 case DIV:
-                    opAtual = '/';
+                    item.campo = stof(digito);
+                    inserirFloat(plResult, item);
+
+                    crt.campo = '/';
+                    inserir(&plOperadores, crt);
+                    digito = "";
+
                     break;
                 case SOMA:
-                    opAtual = 'p';
+                    
+                    item.campo = stof(digito);
+                    inserirFloat(plResult, item);
+
+                    crt.campo = '+';
                     inserir(&plOperadores, crt);
+                    
+                    opAtual = 'M';
+                    inserir(&plOperadores, crt);
+
+                    digito = "";
+
                     break;
                 case SUB:
-                    opAtual = 'p';
+                    item.campo = stof(digito);
+                    inserirFloat(plResult, item);
+
+                    crt.campo = '-';
                     inserir(&plOperadores, crt);
+                    digito = "";
                     break;
 
             } 
+            
+            printf("\n");
 
-            if (i == exp.length() - 1) {
-                T_ItemFloat res;
-                int len = plResult -> qtdeAtual;
+            // if (i == l - 1) {
+            //     T_ItemFloat res;
+            //     int len = plResult -> qtdeAtual;
                 
-                for (int c = 1;c < len;c++) {
-                    if (plOperadores.dados[c - 1].campo == '+') {
-                        plResult -> dados[plResult -> base].campo += plResult -> dados[plResult -> base + c].campo;
-                    }
-                    if (plOperadores.dados[c - 1].campo == '-') {
-                        plResult -> dados[plResult -> base].campo -= plResult -> dados[c].campo;
-                    }
-                }
+            //     for (int c = 1;c < len;c++) {
+            //         if (plOperadores.dados[c - 1].campo == '+') {
+            //             plResult -> dados[plResult -> base].campo += plResult -> dados[plResult -> base + c].campo;
+            //         }
+            //         if (plOperadores.dados[c - 1].campo == '-') {
+            //             plResult -> dados[plResult -> base].campo -= plResult -> dados[c].campo;
+            //         }
+            //     }
 
-                for (int o = 0;o < plResult -> qtdeAtual;o++) {
-                    removerFloat(plResult);
-                }
+            //     for (int o = 0;o < plResult -> qtdeAtual;o++) {
+            //         removerFloat(plResult);
+            //     }
                 
-            } 
-        }  
+            // } 
+        } 
+        for (int p = 0;p <= plResult->topo;p++) {
+            std::cout << plResult->dados[p].campo << " - ";
+        }
+        printf("\n");
     }
 } 
 
@@ -208,6 +257,20 @@ int main() {
     std::cout << "Digite a expressão: ";
 
     getline(std::cin, expressao);
+
+    exp[0] = '3';
+    exp[1] = '-';
+    exp[2] = '4';
+    exp[3] = '/';
+    exp[4] = '2';
+    exp[5] = '*';
+    exp[6] = '5';
+    exp[7] = '-';
+    exp[8] = '9';
+    exp[9] = '/';
+    exp[10] = '6';
+    exp[11] = '-';
+    exp[12] = '7';
     
     for (int c = 0;c < strlen(exp);c++) {
         if (exp[c] == '(') {
@@ -227,9 +290,9 @@ int main() {
     T_PilhaFloat plResult;
     iniciarPilhaInt(&plResult);
 
-    calcular(&pilha, &plResult, temParentese, expressao);
+    calcular(&pilha, &plResult, temParentese, expressao, exp);
 
-    std::cout << plResult.dados[0].campo << " ";
+    // std::cout << plResult.dados[0].campo << " ";
 
     printf("\n\n");
 

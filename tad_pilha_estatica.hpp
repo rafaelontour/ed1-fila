@@ -20,6 +20,11 @@ struct T_ItemFloat { // campo como int
 		campo = valor;
 		return *this;
 	}
+
+	// std::ostream& operator <<(std::ostream& os, T_PilhaFloat& index) {
+	// 	os << "Valor: " << index.base;
+	// 	return os;
+	// }
 };
 
 
@@ -40,7 +45,6 @@ struct T_PilhaFloat { // Usando T_Item com campo do tipo int
 	int topo;
 	int qtdeAtual;
 	T_ItemFloat dados[max];
-
 
 };
 
