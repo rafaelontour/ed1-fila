@@ -10,103 +10,179 @@ enum Operacoes {
     SUB='-', 
     DIV='/' 
 };
+
     
-void posfixa_simples(T_Pilha *plOutput, char exp[], bool temParentese) {
+void posfixa_simples(T_Pilha *plOutput, std::string exp, bool temParentese) {
     T_Pilha plOperadores;
+    std::string pos_fixa = "";
     iniciarPilha(&plOperadores);
     T_Item item;
+    char opAtual = 'p';
 
+    printf("Notação posfixa: ");
 
-    if (temParentese) {
-        for (int i = 0;i < strlen(exp);i++) {
-            item.campo = exp[i];
-        
-            switch (exp[i]) {
-                case '0'...'9': 
-                    inserir(plOutput, item); // Vetor de números
-                    break; 
-                case MULT...DIV:
-                    inserir(&plOperadores, item); // Vetor de operadores
-                    break;
-                case ')': 
-                    inserir(plOutput, plOperadores.dados[plOperadores.topo-1]);
+    for (int i = 0;i < exp.length();i++) {
+        item.campo = exp[i];
+
+        switch (exp[i]) {
+            case '0'...'9': 
+                inserir(plOutput, item);
+                if (i == (exp.length() - 1)) {
+                    item.campo = plOperadores.dados[plOperadores.topo - 1].campo;
+                    inserir(plOutput, item);
                     remover(&plOperadores);
-                    break; 
-                 
-            } 
-        }  
-    } else {
-        
-    }
+                } 
+                break;
+            case MULT...DIV:    
+                inserir(&plOperadores, item);
+                break;
+            case ')': 
+                item.campo = plOperadores.dados[plOperadores.topo - 1].campo;
+                inserir(plOutput, item);
+                remover(&plOperadores);
+                break;         
+        } 
+    } 
+    item.campo = plOperadores.dados[plOperadores.topo - 1].campo;
+    inserir(plOutput, item);
+    remover(&plOperadores);
 }
 
-void calcular(T_Pilha *plOutput, T_PilhaFloat *plResult, bool temParentese, std::string exp) {
+void calcular(T_PilhaFloat *plResult, bool temParentese, std::string exp) {
 
     if (temParentese) {
-        for (int c = 0;c < plOutput->qtdeAtual;c++) {
-            T_ItemFloat itemInt, res;
-            
-            T_Item item;
+        T_Pilha plOperadores;
+        iniciarPilha(&plOperadores);
 
-            item.campo = plOutput -> dados[c].campo;
+        T_ItemFloat item;
+        T_Item crt;
+        std::string digito;
+        char opAtual = ' ';
 
-            if (isdigit(item.campo)) {
-                itemInt.campo = (int)item.campo - 48;
-            }
-        
-            switch (item.campo) {
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':  
-                    inserirFloat(plResult, itemInt);
-                    break;
+        for (int i = 0;i < exp.length();i++) {
+            crt.campo = exp[i];
+            switch (exp[i]) {
+                case '0'...'9':
+                    item.campo = float(crt.campo) - 48;
+                
+                    inserirFloat(plResult, item); // Vetor de números
+                    
+                    if (i == exp.length() - 1) {
+                        if (opAtual == '+') {
+                            item.campo = plResult -> dados[plResult -> topo - 1].campo;
+                            item.campo += plResult -> dados[plResult -> topo - 2].campo;
+                        }
+
+                        if (opAtual == '-') {
+                            item.campo = plResult -> dados[plResult -> topo - 2].campo;
+                            item.campo -= plResult -> dados[plResult -> topo - 1].campo;
+                        }
+
+                        if (opAtual == '*') {
+                            item.campo = plResult -> dados[plResult -> topo - 1].campo;
+                            item.campo *= plResult -> dados[plResult -> topo - 2].campo;
+                        }
+                        if (opAtual == '/') {
+                            item.campo = plResult -> dados[plResult -> topo - 2].campo;
+                            item.campo /= plResult -> dados[plResult -> topo - 1].campo;
+                        }
+
+                        crt.campo = plOperadores.dados[plOperadores.topo - 1].campo;
+                        
+                        removerFloat(plResult);
+                        removerFloat(plResult);
+
+                        inserirFloat(plResult, item);
+                    }
+                    
+                    break; 
+               
                 case MULT:
-                    res.campo = plResult -> dados[plResult -> topo - 1].campo;
-                    removerFloat(plResult);
-                    res.campo *= plResult -> dados[plResult->topo - 1].campo;
-                    removerFloat(plResult);
-
-                    inserirFloat(plResult, res);
+                    opAtual = '*';
+                    crt.campo = opAtual;
+                    inserir(&plOperadores, crt);
+                    
                     break;
                 case SOMA:
-                    res.campo = plResult -> dados[plResult -> topo - 1].campo;
-                    removerFloat(plResult);
-
-                    res.campo += plResult -> dados[plResult -> topo - 1].campo;
-                    removerFloat(plResult);
-
-                    inserirFloat(plResult, res);
-                    break; 
+                    opAtual = '+';
+                    crt.campo = opAtual;
+                    inserir(&plOperadores, crt);
+                    
+                    break;
                 case SUB:
-                    res.campo = plResult -> dados[plResult->topo - 1].campo;
-                    removerFloat(plResult);
-
-                    res.campo -= plResult -> dados[plResult->topo - 1].campo;
-                    removerFloat(plResult);
-
-                    inserirFloat(plResult, res);
-                    break; 
+                    opAtual = '-';
+                    crt.campo = opAtual;
+                    inserir(&plOperadores, crt);
+                    
+                    break;
                 case DIV:
-                    res.campo = plResult -> dados[plResult->topo - 1].campo;
+                    opAtual = '/';
+                    crt.campo = opAtual;
+                    inserir(&plOperadores, crt);
+                    
+                    break;
+                case ')':
+                    if (opAtual == '+') {
+                        item.campo = plResult -> dados[plResult -> topo - 1].campo;
+                        item.campo += plResult -> dados[plResult -> topo - 2].campo;
+                    }
+                    if (opAtual == '-') {
+                        item.campo = plResult -> dados[plResult -> topo - 2].campo;
+                        item.campo -= plResult -> dados[plResult -> topo - 1].campo;
+                    }
+
+                    if (opAtual == '*') {
+                        item.campo = plResult -> dados[plResult -> topo - 1].campo;
+                        item.campo *= plResult -> dados[plResult -> topo - 2].campo;
+                    }
+                    if (opAtual == '/') {
+                        item.campo = plResult -> dados[plResult -> topo - 2].campo;
+                        item.campo /= plResult -> dados[plResult -> topo - 1].campo;
+                    }
+
+                    removerFloat(plResult);
                     removerFloat(plResult);
 
-                    res.campo /= plResult -> dados[plResult->topo - 1].campo;
-                    removerFloat(plResult);
+                    inserirFloat(plResult, item); 
+                    remover(&plOperadores);
 
-                    inserirFloat(plResult, res);
-                    break;     
+                    opAtual = plOperadores.dados[plOperadores.topo - 1].campo;
+                    break;
+            } 
+            
+        } 
 
+        for (int c = plResult->qtdeAtual - 1;c != 0;c--) {
+            if (plResult -> qtdeAtual == 1) {
+                break;
             }
+
+            opAtual = plOperadores.dados[plOperadores.topo - 1].campo;
+            if (opAtual == '+') {
+                item.campo = plResult -> dados[plResult -> topo - 1].campo;
+                item.campo += plResult -> dados[plResult -> topo - 2].campo;
+            }
+            if (opAtual == '-') {
+                item.campo = plResult -> dados[plResult -> topo - 2].campo;
+                item.campo -= plResult -> dados[plResult -> topo - 1].campo;
+            }
+
+            if (opAtual == '*') {
+                item.campo = plResult -> dados[plResult -> topo - 1].campo;
+                item.campo *= plResult -> dados[plResult -> topo - 2].campo;
+            }
+            if (opAtual == '/') {
+                item.campo = plResult -> dados[plResult -> topo - 2].campo;
+                item.campo /= plResult -> dados[plResult -> topo - 1].campo;
+            }
+            
+            removerFloat(plResult);
+            removerFloat(plResult);
+            remover(&plOperadores);
+
+            inserirFloat(plResult, item);
         }
     } else { 
-        
         char opAtual = 'p';
         T_Pilha plOperadores;
         T_ItemFloat item;
@@ -195,41 +271,39 @@ void calcular(T_Pilha *plOutput, T_PilhaFloat *plResult, bool temParentese, std:
 
 int main() { 
     T_Pilha pilha;
-    char exp[15];
     bool temParentese = false;
 
     iniciarPilha(&pilha);
 
     std::string expressao; // A expressão a ser lida
-    std::string vetor[10]; // Vetor para os números
     std::string digito = "";
-    char op[10]; // Vetor para operadores
     
     std::cout << "Digite a expressão: ";
 
     getline(std::cin, expressao);
     
-    for (int c = 0;c < strlen(exp);c++) {
-        if (exp[c] == '(') {
+    for (int c = 0;c < expressao.length();c++) {
+        if (expressao[c] == '(') {
             temParentese = true;
             break;
         }
 
     }
 
-    posfixa_simples(&pilha, exp, temParentese);
+    posfixa_simples(&pilha, expressao, temParentese);
 
-    for (int i = 0;i < pilha.topo;i++) {
-        std::cout << pilha.dados[i].campo << " ";
-    }
+    for (int c = 0;c < pilha.topo;c++) { // Imprimindo posfixa
+        std::cout << pilha.dados[c].campo << ' ';
+    }  
 
-    printf("\nResultado: ");
+    printf("\n");
+
     T_PilhaFloat plResult;
     iniciarPilhaInt(&plResult);
 
-    calcular(&pilha, &plResult, temParentese, expressao);
-
-    std::cout << plResult.dados[0].campo << " ";
+    calcular(&plResult, temParentese, expressao);
+    printf("\nResultado: ");
+    std::cout << plResult.dados[plResult.base].campo << " ";
 
     printf("\n\n");
 
